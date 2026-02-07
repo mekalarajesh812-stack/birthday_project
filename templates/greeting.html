@@ -1,0 +1,45 @@
+<div class="card shadow-lg bg-white">
+    <h1>{{ greeting.title }}</h1>
+
+    <!-- Typing message -->
+    <p id="typingMessage" class="mt-4 fs-5" style="min-height: 140px;"></p>
+
+    <p class="mt-4">❤️ Forever Yours ❤️</p>
+</div>
+
+<script>
+    // 🌹 Romantic sentences
+    const sentences = [
+        "On this beautiful day, the world feels brighter simply because you exist in it.",
+        "Loving you has been the greatest gift of my life, a feeling that grows deeper with every heartbeat.",
+        "Your presence fills my soul with peace, warmth, and a love I never knew was possible.",
+        "No matter where life takes us, my heart will always find its way back to you.",
+        "Happy Birthday, my love — today I celebrate you, and forever I choose you ❤️"
+    ];
+
+    const display = document.getElementById("typingMessage");
+    let currentSentence = 0;
+    let charIndex = 0;
+    const typingSpeed = 50; // ms per character
+    const sentenceDelay = 800; // ms between sentences
+
+    function typeSentence() {
+        if (currentSentence < sentences.length) {
+            if (charIndex < sentences[currentSentence].length) {
+                display.innerHTML += sentences[currentSentence][charIndex];
+                charIndex++;
+                setTimeout(typeSentence, typingSpeed);
+            } else {
+                display.innerHTML += "<br><br>";
+                currentSentence++;
+                charIndex = 0;
+                setTimeout(typeSentence, sentenceDelay);
+            }
+        }
+    }
+
+    window.onload = function() {
+        // 🌸 Delay typing 5 seconds (300,000ms)
+        setTimeout(typeSentence, 300000); 
+    };
+</script>

@@ -1,0 +1,344 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>For You ❤️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+ margin:0;
+ font-family:'Segoe UI',sans-serif;
+ background:radial-gradient(circle at top,#111,#050505);
+ color:white;
+ overflow-x:hidden;
+ min-height:100vh;
+ scroll-behavior:smooth;
+}
+
+/* 🌟 BACKGROUND SHINE */
+body::before{
+ content:"";
+ position:fixed;
+ inset:-40%;
+ background:linear-gradient(120deg,
+  transparent 30%,
+  rgba(255,120,150,.08),
+  transparent 70%);
+ animation:shine 14s linear infinite;
+ z-index:-1;
+}
+@keyframes shine{
+ from{transform:translateX(-30%)}
+ to{transform:translateX(30%)}
+}
+
+/* NAV */
+nav{
+ position:fixed;
+ top:15px;
+ left:50%;
+ transform:translateX(-50%);
+ display:flex;
+ gap:15px;
+ z-index:50;
+}
+nav button{
+ background:rgba(0,0,0,.6);
+ border:1px solid rgba(255,255,255,.3);
+ color:white;
+ padding:8px 18px;
+ border-radius:20px;
+ cursor:pointer;
+ transition:.3s;
+}
+nav button.active{
+ background:#e63946;
+ box-shadow:0 0 15px rgba(230,57,70,.9);
+}
+nav button.locked{
+ opacity:.4;
+ cursor:not-allowed;
+}
+
+/* SECTIONS */
+.section{
+ display:none;
+ min-height:100vh;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ text-align:center;
+ padding-top:90px;
+}
+
+/* HEART */
+#heart{
+ font-size:90px;
+ animation:beat .8s infinite;
+}
+@keyframes beat{
+ 0%{transform:scale(1)}
+ 50%{transform:scale(1.3)}
+ 100%{transform:scale(1)}
+}
+
+/* PHOTO */
+#photo{
+ width:250px;
+ height:180px;
+ background:url("{% static 'images/whole.jpeg' %}") center/cover no-repeat;
+ border-radius:15px;
+ box-shadow:0 0 20px rgba(230,57,70,.7);
+ margin-top:20px;
+ display:none;
+}
+
+/* GALLERY */
+#gallery{
+ display:none;
+ grid-template-columns:repeat(2,1fr);
+ gap:20px;
+ max-width:600px;
+ margin-top:30px;
+}
+.photo-box{
+ opacity:0;
+ height:250px;
+ border-radius:15px;
+ overflow:hidden;
+ transition:opacity 1s;
+}
+.photo-box img{
+ width:100%;
+ height:100%;
+ object-fit:cover;
+}
+
+/* TYPING */
+#typing{
+ display:none;
+ font-size:22px;
+ max-width:700px;
+ line-height:1.6;
+ margin-top:30px;
+}
+
+/* FINAL MESSAGE */
+#final{
+ display:none;
+ flex-direction:column;
+ align-items:center;
+ margin-top:30px;
+}
+#finalMsg{
+ font-family:'Dancing Script',cursive;
+ font-size:30px;
+ animation:glow .9s infinite;
+}
+@keyframes glow{
+ 0%{text-shadow:0 0 6px rgba(255,120,150,.4)}
+ 50%{text-shadow:0 0 22px rgba(230,57,70,.9)}
+ 100%{text-shadow:0 0 6px rgba(255,120,150,.4)}
+}
+#signature{
+ margin-top:15px;
+ font-family:'Dancing Script',cursive;
+ font-size:24px;
+ opacity:0;
+ transition:2s;
+}
+
+/* BUTTON */
+.replay{
+ margin-top:25px;
+ padding:8px 22px;
+ border-radius:20px;
+ border:none;
+ cursor:pointer;
+ background:#e63946;
+ color:white;
+ display:none; /* hidden until section ends */
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+ <button id="navSurprise" onclick="goSurprise()">🎁 Surprise</button>
+ <button id="navPhotos" onclick="goPhotos()">📸 Fav Photos</button>
+ <button id="navMessage" class="locked" onclick="goMessage()">💌 Message</button>
+</nav>
+
+<!-- SURPRISE -->
+<section class="section" id="surprise">
+ <h1 id="title"></h1>
+ <h3 id="sub"></h3>
+ <div id="heart" style="display:none">❤️</div>
+ <div id="photo"></div>
+ <button class="replay" onclick="playSurprise(true)">🔁 Replay</button>
+</section>
+
+<!-- PHOTOS -->
+<section class="section" id="photos">
+ <div id="gallery">
+  <div class="photo-box"><img src="{% static 'images/photo1.jpeg' %}"></div>
+  <div class="photo-box"><img src="{% static 'images/photo2.jpeg' %}"></div>
+  <div class="photo-box"><img src="{% static 'images/photo3.jpeg' %}"></div>
+  <div class="photo-box"><img src="{% static 'images/photo5.jpeg' %}"></div>
+ </div>
+ <button class="replay" onclick="playPhotos(true)">🔁 Replay</button>
+</section>
+
+<!-- MESSAGE -->
+<section class="section" id="message">
+ <div id="typing"></div>
+ <div id="final">
+  <p id="finalMsg"></p>
+  <div id="signature">— Yours, Always ❤️</div>
+ </div>
+ <button class="replay" onclick="playMessage(true)">🔁 Replay</button>
+</section>
+
+<script>
+const titleText="🎉 Happy Birthday Pellam Garu ❤️ 🎉";
+const subText="Just see my heart… what is inside ❤️";
+const sentences=[
+ "On this beautiful night, stars shine softer for you.",
+ "Loving you is the strongest peace I know.",
+ "Your smile lights my darkest moments.",
+ "With you, silence feels like home.",
+ "I choose you — always ❤️"
+];
+const finalText="You are my today, my tomorrow, and every heartbeat in between ❤️";
+
+let surpriseDone=false;
+
+function resetNav(){
+ document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+}
+function hideAll(){
+ document.querySelectorAll(".section").forEach(s=>s.style.display="none");
+}
+
+/* 🎁 SURPRISE */
+function goSurprise(){
+ resetNav();
+ navSurprise.classList.add("active");
+ hideAll();
+ surprise.style.display="flex";
+ playSurprise(false);
+}
+function playSurprise(force){
+ if(surpriseDone && !force) return;
+ document.querySelector("#surprise .replay").style.display="none";
+ title.innerHTML=""; sub.innerHTML="";
+ heart.style.display="none"; photo.style.display="none";
+
+ typeText(titleText,title,70,()=>{
+  typeText(subText,sub,60,()=>{
+   heart.style.display="block";
+   setTimeout(()=>{
+    photo.style.display="block";
+    surpriseDone = true;
+    navMessage.classList.remove("locked");
+    document.querySelector("#surprise .replay").style.display="inline-block";
+   },2000);
+  });
+ });
+}
+
+/* 📸 PHOTOS */
+function goPhotos(){
+ resetNav();
+ navPhotos.classList.add("active");
+ hideAll();
+ photos.style.display="flex";
+ playPhotos(false);
+}
+function playPhotos(force){
+ document.querySelector("#photos .replay").style.display="none";
+ gallery.style.display="grid";
+ const boxes = document.querySelectorAll(".photo-box");
+ boxes.forEach((b,i)=>{
+  b.style.opacity=0;
+  setTimeout(()=>{
+   b.style.opacity=1;
+   if(i === boxes.length - 1){
+    setTimeout(()=>{
+     document.querySelector("#photos .replay").style.display="inline-block";
+    },600);
+   }
+  },i*600);
+ });
+}
+
+/* 💌 MESSAGE */
+function goMessage(){
+ if(!surpriseDone){
+  alert("Please open the Surprise first ❤️");
+  return;
+ }
+ resetNav();
+ navMessage.classList.add("active");
+ hideAll();
+ message.style.display="flex";
+ playMessage(false);
+}
+function playMessage(force){
+ document.querySelector("#message .replay").style.display="none";
+ typing.innerHTML=""; finalMsg.innerHTML=""; signature.style.opacity=0;
+ typing.style.display="block";
+
+ let i=0,j=0;
+ function go(){
+  if(i<sentences.length){
+   if(j<sentences[i].length){
+    typing.innerHTML+=sentences[i][j++];
+    setTimeout(go,40);
+   }else{
+    typing.innerHTML+="<br><br>";
+    j=0;i++;
+    setTimeout(go,600);
+   }
+  }else{
+   final.style.display="flex";
+   typeFinal();
+  }
+ }
+ go();
+}
+function typeFinal(){
+ let i=0;
+ function t(){
+  if(i<finalText.length){
+   finalMsg.innerHTML+=finalText[i++];
+   setTimeout(t,60);
+  }else{
+   signature.style.opacity=1;
+   setTimeout(()=>{
+    document.querySelector("#message .replay").style.display="inline-block";
+   },1200);
+  }
+ }
+ t();
+}
+
+function typeText(text,el,speed,cb){
+ let i=0;
+ function t(){
+  if(i<text.length){
+   el.innerHTML+=text[i++];
+   setTimeout(t,speed);
+  }else cb();
+ }
+ t();
+}
+</script>
+
+</body>
+</html>
